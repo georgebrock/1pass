@@ -1,4 +1,5 @@
 from base64 import b64decode
+from Crypto.Cipher import AES
 from pbkdf2 import pbkdf2_bin
 
 
@@ -28,3 +29,8 @@ class EncryptionKey(object):
                                         keylen=32)
         self.derived_key = derived_key_and_iv[0:16]
         self.derived_initialisation_vector = derived_key_and_iv[16:]
+
+    def _decrypt(self, password):
+        self._derive(password)
+        aes = AES.new(self.derived_key, AES.MODE_CBC, self.derived_initialisation_vector)
+        self.decrypted_key = aes.decrypt(self.data)

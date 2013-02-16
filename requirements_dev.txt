@@ -1,2 +1,3 @@
 nose
 simple-pbkdf2
+pycrpto
