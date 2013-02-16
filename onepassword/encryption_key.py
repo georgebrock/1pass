@@ -27,7 +27,7 @@ class EncryptionKey(object):
 
     def decrypt(self, password):
         derived_key, derived_init_vector = self._derive(password)
-        aes = AES.new(derived_key, AES.MODE_CBC, derived_init_vector)
+        aes = AES.new(derived_key, mode=AES.MODE_CBC, IV=derived_init_vector)
         return aes.decrypt(self.data.data)
 
     def _set_iterations(self, iterations):
