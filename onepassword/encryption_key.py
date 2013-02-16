@@ -1,4 +1,5 @@
 from base64 import b64decode
+from pbkdf2 import pbkdf2_bin
 
 
 class EncryptionKey(object):
@@ -21,3 +22,9 @@ class EncryptionKey(object):
 
     def _set_iterations(self, iterations):
         self.iterations = max(int(iterations), self.MINIMUM_ITERATIONS)
+
+    def _derive(self, password):
+        derived_key_and_iv = pbkdf2_bin(password, self.salt, self.iterations,
+                                        keylen=32)
+        self.derived_key = derived_key_and_iv[0:16]
+        self.derived_initialisation_vector = derived_key_and_iv[16:]
