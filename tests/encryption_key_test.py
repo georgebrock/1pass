@@ -31,33 +31,14 @@ class EncryptionKeyTest(TestCase):
         key = EncryptionKey(data="", iterations=500)
         self.assertEquals(1000, key.iterations)
 
-    def test_key_derivation(self):
-        key = EncryptionKey(
-            data=self.example_data["data"],
-            iterations=self.example_data["iterations"],
-        )
-        key._derive(password="badger")
-
-        self.assertEquals(
-            "\x3a\xb5\x80\xfb\x9a\x8b\x75\x04\xb7\xec\x8a\x62\x7e\x6e\x5a\xc0",
-            key.derived_key,
-        )
-        self.assertEquals(
-            "\xa6\xbc\x9f\xbc\x9b\x5b\xb2\xec\x0b\x58\x53\xdb\x62\x78\xbb\xd8",
-            key.derived_initialisation_vector,
-        )
-
     def test_key_decryption(self):
         key = EncryptionKey(
             data=self.example_data["data"],
             iterations=self.example_data["iterations"],
         )
-        key._decrypt(password="badger")
+        decrypted = key.decrypt(password="badger")
 
-        self.assertEquals(
-            self.decrypted_key_for_example_data,
-            key.decrypted_key,
-        )
+        self.assertEquals(self.decrypted_key_for_example_data, decrypted)
 
     @property
     def example_data(self):

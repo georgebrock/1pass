@@ -12,6 +12,11 @@ class EncryptionKey(object):
         self._set_salt_and_data(data)
         self._set_iterations(iterations)
 
+    def decrypt(self, password):
+        derived_key, derived_init_vector = self._derive(password)
+        aes = AES.new(derived_key, AES.MODE_CBC, derived_init_vector)
+        return aes.decrypt(self.data)
+
     def _set_salt_and_data(self, data):
         decoded_data = b64decode(data)
         if decoded_data.startswith(self.SALTED_PREFIX):
@@ -27,10 +32,7 @@ class EncryptionKey(object):
     def _derive(self, password):
         derived_key_and_iv = pbkdf2_bin(password, self.salt, self.iterations,
                                         keylen=32)
-        self.derived_key = derived_key_and_iv[0:16]
-        self.derived_initialisation_vector = derived_key_and_iv[16:]
-
-    def _decrypt(self, password):
-        self._derive(password)
-        aes = AES.new(self.derived_key, AES.MODE_CBC, self.derived_initialisation_vector)
-        self.decrypted_key = aes.decrypt(self.data)
+        return (
+            derived_key_and_iv[0:16],
+            derived_key_and_iv[16:],
+        )
