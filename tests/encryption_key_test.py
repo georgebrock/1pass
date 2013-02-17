@@ -37,6 +37,7 @@ class EncryptionKeyTest(TestCase):
         key = EncryptionKey(
             data=self.example_data["data"],
             iterations=self.example_data["iterations"],
+            validation=self.example_data["validation"],
         )
         decrypted = key.decrypt(password="badger")
 

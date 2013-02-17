@@ -1,5 +1,6 @@
 from base64 import b64decode
 from Crypto.Cipher import AES
+from Crypto.Hash import MD5
 from pbkdf2 import pbkdf2_bin
 
 
@@ -28,7 +29,9 @@ class EncryptionKey(object):
     def decrypt(self, password):
         derived_key, derived_init_vector = self._derive(password)
         aes = AES.new(derived_key, mode=AES.MODE_CBC, IV=derived_init_vector)
-        return aes.decrypt(self.data.data)
+        decrypted_key = aes.decrypt(self.data.data)
+        if self._validate(decrypted_key):
+            return decrypted_key
 
     def _set_iterations(self, iterations):
         self.iterations = max(int(iterations), self.MINIMUM_ITERATIONS)
@@ -39,4 +42,22 @@ class EncryptionKey(object):
         return (
             derived_key_and_iv[0:16],
             derived_key_and_iv[16:],
+        )
+
+    def _validate(self, decrypted_key):
+        key, iv = self._parse_open_ssl_key(decrypted_key, self._validation.salt)
+        aes = AES.new(key, mode=AES.MODE_CBC, IV=iv)
+        verification = aes.decrypt(self._validation.data)
+        return verification == decrypted_key
+
+    def _parse_open_ssl_key(self, key, salt):
+        key = key[0:-16]
+        key_and_iv = ""
+        prev = ""
+        while len(key_and_iv) < 32:
+            prev = MD5.new(prev + key + salt).digest()
+            key_and_iv += prev
+        return (
+            key_and_iv[0:16],
+            key_and_iv[16:],
         )
