@@ -6,7 +6,7 @@ from onepassword.encryption_key import EncryptionKey
 
 class Keychain(object):
     def __init__(self, path):
-        self._path = path
+        self._path = os.path.expanduser(path)
         self._load_encryption_keys()
         self._load_item_list()
         self._locked = True
