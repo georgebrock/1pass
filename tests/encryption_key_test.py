@@ -17,6 +17,10 @@ class SaltyStringTest(TestCase):
 
 
 class EncryptionKeyTest(TestCase):
+    def test_identifier(self):
+        key = EncryptionKey(data="", identifier="ABC123")
+        self.assertEquals("ABC123", key.identifier)
+
     def test_iterations_with_string(self):
         key = EncryptionKey(data="", iterations="40000")
         self.assertEquals(40000, key.iterations)

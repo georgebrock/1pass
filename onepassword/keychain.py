@@ -24,5 +24,5 @@ class Keychain(object):
 
         self._encryption_keys = {}
         for key_definition in key_data["list"]:
-            level = key_definition["level"]
-            self._encryption_keys[level] = EncryptionKey(**key_definition)
+            key = EncryptionKey(**key_definition)
+            self._encryption_keys[key.identifier] = key
