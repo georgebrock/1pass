@@ -1,3 +1,4 @@
+from mock import Mock
 import os
 from unittest import TestCase
 
@@ -13,6 +14,18 @@ class KeychainItemTest(TestCase):
     def test_key_identifier(self):
         item = KeychainItem(self.example_row, path=self.data_path)
         self.assertEquals("525E210E0B4C49799D7E47DD8E789C78", item.key_identifier)
+
+    def test_decrypt(self):
+        mock_key = Mock()
+        mock_key.decrypt.return_value = """{"fields":[
+            {"name":"Username","value":"user","designation":"username"},
+            {"value":"abcdef","name":"Password","designation":"password"}
+        ]}"""
+        item = KeychainItem(self.example_row, path=self.data_path)
+
+        self.assertIsNone(item.password)
+        item.decrypt_with(mock_key)
+        self.assertEquals("abcdef", item.password)
 
     @property
     def data_path(self):

@@ -16,9 +16,12 @@ class Keychain(object):
         return reduce(lambda x, y: x and y, unlock_results)
 
     def item(self, name):
-        try:
-            return self._items[name]
-        except KeyError:
+        if name in self._items:
+            item = self._items[name]
+            key = self._encryption_keys[item.key_identifier]
+            item.decrypt_with(key)
+            return item
+        else:
             return None
 
     def _load_encryption_keys(self):
@@ -46,11 +49,20 @@ class KeychainItem(object):
     def __init__(self, row, path):
         self.identifier = row[0]
         self.name = row[2]
+        self.password = None
         self._path = path
 
     @property
     def key_identifier(self):
         return self._lazily_load("_key_identifier")
+
+    def decrypt_with(self, key):
+        encrypted_json = self._lazily_load("_encrypted_json")
+        decrypted_json = key.decrypt(self._encrypted_json)
+        data = json.loads(decrypted_json)
+        for field in data["fields"]:
+            if field["designation"] == "password" or field["name"] == "Password":
+                self.password = field["value"]
 
     def _lazily_load(self, attr):
         if not hasattr(self, attr):
@@ -64,3 +76,4 @@ class KeychainItem(object):
             item_data = json.load(f)
 
         self._key_identifier = item_data["keyID"]
+        self._encrypted_json = item_data["encrypted"]
