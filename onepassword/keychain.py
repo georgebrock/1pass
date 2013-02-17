@@ -61,7 +61,8 @@ class KeychainItem(object):
         decrypted_json = key.decrypt(self._encrypted_json)[:-1]
         data = json.loads(decrypted_json)
         for field in data["fields"]:
-            if field["designation"] == "password" or field["name"] == "Password":
+            if field.get("designation") == "password" or \
+               field.get("name") == "Password":
                 self.password = field["value"]
 
     def _lazily_load(self, attr):
