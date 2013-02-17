@@ -20,7 +20,7 @@ class KeychainItemTest(TestCase):
         mock_key.decrypt.return_value = """{"fields":[
             {"name":"Username","value":"user","designation":"username"},
             {"value":"abcdef","name":"Password","designation":"password"}
-        ]}"""
+        ]}\x01"""
         item = KeychainItem(self.example_row, path=self.data_path)
 
         self.assertIsNone(item.password)
