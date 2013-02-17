@@ -23,4 +23,9 @@ while keychain.locked:
         print("")
         sys.exit(0)
 
-print keychain.item(args.item).password
+item = keychain.item(args.item)
+if item is not None:
+    print(item.password)
+else:
+    sys.stderr.write("Could not find a item named '%s'\n" % args.item)
+    sys.exit(1)
