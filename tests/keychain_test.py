@@ -2,7 +2,19 @@ from mock import Mock
 import os
 from unittest import TestCase
 
-from onepassword.keychain import KeychainItem
+from onepassword.keychain import Keychain, KeychainItem
+
+
+class KeychainTest(TestCase):
+    def test_locked_flag(self):
+        keychain = Keychain(self.data_path)
+        self.assertTrue(keychain.locked)
+        self.assertTrue(keychain.unlock("badger"))
+        self.assertFalse(keychain.locked)
+
+    @property
+    def data_path(self):
+        return os.path.join(os.path.dirname(__file__), "data", "1Password.agilekeychain")
 
 
 class KeychainItemTest(TestCase):

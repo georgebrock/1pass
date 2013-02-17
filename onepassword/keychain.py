@@ -9,11 +9,14 @@ class Keychain(object):
         self._path = path
         self._load_encryption_keys()
         self._load_item_list()
+        self._locked = True
 
     def unlock(self, password):
         unlocker = lambda key: key.unlock(password)
         unlock_results = map(unlocker, self._encryption_keys.values())
-        return reduce(lambda x, y: x and y, unlock_results)
+        result = reduce(lambda x, y: x and y, unlock_results)
+        self._locked = not result
+        return result
 
     def item(self, name):
         if name in self._items:
@@ -23,6 +26,10 @@ class Keychain(object):
             return item
         else:
             return None
+
+    @property
+    def locked(self):
+        return self._locked
 
     def _load_encryption_keys(self):
         path = os.path.join(self._path, "data", "default", "encryptionKeys.js")
