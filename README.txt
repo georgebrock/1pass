@@ -36,7 +36,7 @@ An example of real-world use
 
 I wrote this so I could add the following line to my ``.muttrc`` file::
 
-    set imap_pass = "`~/code/1pass/bin/1pass 'Gooogle: personal'`"
+    set imap_pass = "`1pass 'Google: personal'`"
 
 Now, whenever I start ``mutt``, I am prompted for my 1Password Master Password
 and not my Gmail password.
