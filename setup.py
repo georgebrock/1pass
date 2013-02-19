@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 
 
-VERSION = "0.1.1"
+VERSION = "0.1.3"
 
 def readme():
     """ Load the contents of the README file """
@@ -18,10 +18,11 @@ setup(
     author_email="george.brocklehurst@gmail.com",
     description="A Python library and command line interface for 1Password",
     long_description=readme(),
-    install_requires=["simple-pbkdf2", "pycrypto"],
+    install_requires=["simple-pbkdf2", "PyCrypto"],
     license="MIT",
     url="http://github.com/georgebrock/1pass",
     classifiers=[],
+    packages=["onepassword"],
     scripts=["bin/1pass"],
 
     tests_require=["nose", "mock"],
