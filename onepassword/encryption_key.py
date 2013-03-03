@@ -51,7 +51,14 @@ class EncryptionKey(object):
 
     def _aes_decrypt(self, key, iv, encrypted_data):
         aes = AES.new(key, mode=AES.MODE_CBC, IV=iv)
-        return aes.decrypt(encrypted_data)
+        return self._strip_padding(aes.decrypt(encrypted_data))
+
+    def _strip_padding(self, decrypted):
+        padding_size = ord(decrypted[-1])
+        if padding_size >= 16:
+            return decrypted
+        else:
+            return decrypted[:-padding_size]
 
     def _derive_pbkdf2(self, password):
         key_and_iv = pbkdf2_bin(
