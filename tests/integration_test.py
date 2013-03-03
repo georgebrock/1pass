@@ -5,7 +5,7 @@ from onepassword import Keychain
 
 
 class IntegrationTest(TestCase):
-    def test_unlock_and_read_password(self):
+    def test_unlock_and_read_web_form_password(self):
         path = os.path.join(os.path.dirname(__file__), "data", "1Password.agilekeychain")
         keychain = Keychain(path=path)
 
@@ -18,3 +18,10 @@ class IntegrationTest(TestCase):
         self.assertIsNone(keychain.item("does-not-exist"))
         self.assertEquals("123456", keychain.item("onetosix").password)
         self.assertEquals("abcdef", keychain.item("atof").password)
+
+    def test_unlock_and_read_generated_password(self):
+        path = os.path.join(os.path.dirname(__file__), "data", "1Password.agilekeychain")
+        keychain = Keychain(path=path)
+
+        keychain.unlock("badger")
+        self.assertEquals("foobar", keychain.item("foobar").password)

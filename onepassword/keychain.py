@@ -48,14 +48,26 @@ class Keychain(object):
 
         self._items = {}
         for item_definition in item_list:
-            item = KeychainItem(item_definition, self._path)
+            item = KeychainItem.build(item_definition, self._path)
             self._items[item.name] = item
 
 
 class KeychainItem(object):
-    def __init__(self, row, path):
-        self.identifier = row[0]
-        self.name = row[2]
+    @classmethod
+    def build(cls, row, path):
+        identifier = row[0]
+        type = row[1]
+        name = row[2]
+        if type == "webforms.WebForm":
+            return WebFormKeychainItem(identifier, name, path)
+        elif type == "passwords.Password":
+            return PasswordKeychainItem(identifier, name, path)
+        else:
+            return KeychainItem(identifier, name, path)
+
+    def __init__(self, identifier, name, path):
+        self.identifier = identifier
+        self.name = name
         self.password = None
         self._path = path
 
@@ -67,10 +79,11 @@ class KeychainItem(object):
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
         data = json.loads(decrypted_json)
-        for field in data["fields"]:
-            if field.get("designation") == "password" or \
-               field.get("name") == "Password":
-                self.password = field["value"]
+        self.password = self._find_password(data)
+
+    def _find_password(self, data):
+        raise Exception("Cannot extract a password from this type of"
+                        " keychain item")
 
     def _lazily_load(self, attr):
         if not hasattr(self, attr):
@@ -85,3 +98,16 @@ class KeychainItem(object):
 
         self._key_identifier = item_data["keyID"]
         self._encrypted_json = item_data["encrypted"]
+
+
+class WebFormKeychainItem(KeychainItem):
+    def _find_password(self, data):
+        for field in data["fields"]:
+            if field.get("designation") == "password" or \
+               field.get("name") == "Password":
+                return field["value"]
+
+
+class PasswordKeychainItem(KeychainItem):
+    def _find_password(self, data):
+        return data["password"]
