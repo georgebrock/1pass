@@ -41,6 +41,11 @@ I wrote this so I could add the following line to my ``.muttrc`` file::
 Now, whenever I start ``mutt``, I am prompted for my 1Password Master Password
 and not my Gmail password.
 
+Contributors
+============
+
+* Pip Taylor <http://github.com/pipt>
+
 License
 =======
 
