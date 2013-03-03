@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 
 
-VERSION = "0.1.4"
+VERSION = "0.1.5"
 
 def readme():
     """ Load the contents of the README file """
