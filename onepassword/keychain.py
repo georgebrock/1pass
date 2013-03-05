@@ -78,10 +78,10 @@ class KeychainItem(object):
     def decrypt_with(self, key):
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
-        data = json.loads(decrypted_json)
-        self.password = self._find_password(data)
+        self._data = json.loads(decrypted_json)
+        self.password = self._find_password()
 
-    def _find_password(self, data):
+    def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
                         " keychain item")
 
@@ -101,13 +101,13 @@ class KeychainItem(object):
 
 
 class WebFormKeychainItem(KeychainItem):
-    def _find_password(self, data):
-        for field in data["fields"]:
+    def _find_password(self):
+        for field in self._data["fields"]:
             if field.get("designation") == "password" or \
                field.get("name") == "Password":
                 return field["value"]
 
 
 class PasswordKeychainItem(KeychainItem):
-    def _find_password(self, data):
-        return data["password"]
+    def _find_password(self):
+        return self._data["password"]
