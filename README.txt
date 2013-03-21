@@ -17,6 +17,12 @@ not where you keep your keychain::
 
     1pass --path ~/whatever/1Password.agilekeychain mail.google.com
 
+Or, you can set your keychain path as an enviornment variable::
+
+    export ONEPASSWORD_KEYCHAIN=/path/to/keychain
+
+    1pass mail.google.com
+
 The name you pass on the command line must exactly match the name of an item in
 your 1Password keychain.
 
