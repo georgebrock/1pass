@@ -51,6 +51,7 @@ Contributors
 ============
 
 * Pip Taylor <http://github.com/pipt>
+* Adam Coddington <https://github.com/latestrevision>
 
 License
 =======
