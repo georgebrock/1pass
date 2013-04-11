@@ -49,6 +49,14 @@ class KeychainItemTest(TestCase):
         item = KeychainItem.build(self.example_row, path=self.data_path)
         self.assertEquals("525E210E0B4C49799D7E47DD8E789C78", item.key_identifier)
 
+    def test_security_level(self):
+        item = KeychainItem.build(
+            ["A37F72DAE965416EA920D2E4A1D7B256", "webforms.WebForm", "atof",
+                "example.com", 12345, "", 0, "N"],
+            path=self.data_path,
+        )
+        self.assertEquals("SL5", item.security_level)
+
     def test_decrypt(self):
         mock_key = Mock()
         mock_key.decrypt.return_value = """{"fields":[

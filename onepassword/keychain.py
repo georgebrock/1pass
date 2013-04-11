@@ -90,9 +90,14 @@ class KeychainItem(object):
     def key_identifier(self):
         return self._lazily_load("_key_identifier")
 
+    @property
+    def security_level(self):
+        return self._lazily_load("_security_level")
+
     def decrypt_with(self, keychain):
         key = keychain.key(
             identifier=self.key_identifier,
+            security_level=self.security_level,
         )
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
@@ -114,7 +119,8 @@ class KeychainItem(object):
         with open(path, "r") as f:
             item_data = json.load(f)
 
-        self._key_identifier = item_data["keyID"]
+        self._key_identifier = item_data.get("keyID")
+        self._security_level = item_data.get("securityLevel")
         self._encrypted_json = item_data["encrypted"]
 
 
