@@ -24,6 +24,7 @@ class EncryptionKey(object):
     def __init__(self, data, iterations=0, validation="", identifier=None,
                  level=None):
         self.identifier = identifier
+        self.level = level
         self._encrypted_key = SaltyString(data)
         self._decrypted_key = None
         self._set_iterations(iterations)

@@ -21,6 +21,10 @@ class EncryptionKeyTest(TestCase):
         key = EncryptionKey(data="", identifier="ABC123")
         self.assertEquals("ABC123", key.identifier)
 
+    def test_level(self):
+        key = EncryptionKey(data="", level="SL3")
+        self.assertEquals("SL3", key.level)
+
     def test_iterations_with_string(self):
         key = EncryptionKey(data="", iterations="40000")
         self.assertEquals(40000, key.iterations)
