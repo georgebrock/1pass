@@ -21,11 +21,26 @@ class Keychain(object):
     def item(self, name):
         if name in self._items:
             item = self._items[name]
-            key = self._encryption_keys[item.key_identifier]
-            item.decrypt_with(key)
+            item.decrypt_with(self)
             return item
         else:
             return None
+
+    def key(self, identifier=None, security_level=None):
+        """
+        Tries to find an encryption key, first using the ``identifier`` and
+        if that fails or isn't provided using the ``security_level``.
+        Returns ``None`` if nothing matches.
+        """
+        if identifier:
+            try:
+                return self._encryption_keys[identifier]
+            except KeyError:
+                pass
+        if security_level:
+            for key in self._encryption_keys.values():
+                if key.level == security_level:
+                    return key
 
     @property
     def locked(self):
@@ -75,7 +90,10 @@ class KeychainItem(object):
     def key_identifier(self):
         return self._lazily_load("_key_identifier")
 
-    def decrypt_with(self, key):
+    def decrypt_with(self, keychain):
+        key = keychain.key(
+            identifier=self.key_identifier,
+        )
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
         self._data = json.loads(decrypted_json)
