@@ -74,17 +74,19 @@ class KeychainItem(object):
         type = row[1]
         name = row[2]
         if type == "webforms.WebForm":
-            return WebFormKeychainItem(identifier, name, path)
-        elif type == "passwords.Password":
-            return PasswordKeychainItem(identifier, name, path)
+            return WebFormKeychainItem(identifier, name, path, type)
+        elif type == "passwords.Password" or type == "wallet.onlineservices.GenericAccount":
+            return PasswordKeychainItem(identifier, name, path, type)
         else:
-            return KeychainItem(identifier, name, path)
+            # print(name, repr(type))
+            return KeychainItem(identifier, name, path, type)
 
-    def __init__(self, identifier, name, path):
+    def __init__(self, identifier, name, path, type):
         self.identifier = identifier
         self.name = name
         self.password = None
         self._path = path
+        self._type = type
 
     @property
     def key_identifier(self):
@@ -106,7 +108,7 @@ class KeychainItem(object):
 
     def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
-                        " keychain item")
+                        " keychain item (%s)" % self.type)
 
     def _lazily_load(self, attr):
         if not hasattr(self, attr):

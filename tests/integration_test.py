@@ -25,3 +25,10 @@ class IntegrationTest(TestCase):
 
         keychain.unlock("badger")
         self.assertEquals("foobar", keychain.item("foobar").password)
+
+    def test_unlock_and_read_generic_account_password(self):
+        path = os.path.join(os.path.dirname(__file__), "data", "1Password.agilekeychain")
+        keychain = Keychain(path=path)
+
+        keychain.unlock("badger")
+        self.assertEquals("flibble", keychain.item("Generic Account").password)
