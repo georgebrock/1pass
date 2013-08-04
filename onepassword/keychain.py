@@ -78,7 +78,6 @@ class KeychainItem(object):
         elif type == "passwords.Password" or type == "wallet.onlineservices.GenericAccount":
             return PasswordKeychainItem(identifier, name, path, type)
         else:
-            # print(name, repr(type))
             return KeychainItem(identifier, name, path, type)
 
     def __init__(self, identifier, name, path, type):
@@ -108,7 +107,7 @@ class KeychainItem(object):
 
     def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
-                        " keychain item (%s)" % self.type)
+                        " keychain item (%s)" % self._type)
 
     def _lazily_load(self, attr):
         if not hasattr(self, attr):
