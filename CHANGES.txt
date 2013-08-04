@@ -1,0 +1,14 @@
+0.1.8:
+* Added support for GenericAccount passwords (thanks to Ash Berlin)
+
+0.1.7:
+* Added support for keys identified by a security level or an ID (at some point
+  1Password switched from using one to using the other).
+
+0.1.6:
+* Support non-webform passwords.
+* Accept path to .agilekeychain file as an environment variable (thanks to Adam
+  Coddington).
+
+0.1.5:
+* Handle padding properly (thanks to Pip Taylor).

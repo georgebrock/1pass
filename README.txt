@@ -50,8 +50,9 @@ and not my Gmail password.
 Contributors
 ============
 
-* Pip Taylor <http://github.com/pipt>
+* Pip Taylor <https://github.com/pipt>
 * Adam Coddington <https://github.com/latestrevision>
+* Ash Berlin <https://github.com/ashb>
 
 License
 =======
