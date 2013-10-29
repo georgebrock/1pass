@@ -19,6 +19,11 @@ parser.add_argument(
     default=os.environ.get('ONEPASSWORD_KEYCHAIN', DEFAULT_KEYCHAIN_PATH),
     help="Path to your 1Password.agilekeychain file"
 )
+parser.add_argument(
+    "--no-fuzz",
+    action="store_true",
+    help="Do not perform fuzzy matching on item"
+)
 args = parser.parse_args()
 
 keychain = Keychain(args.path)
@@ -29,7 +34,11 @@ while keychain.locked:
         print("")
         sys.exit(0)
 
-item = keychain.item(args.item)
+if args.no_fuzz:
+    item = keychain.item(args.item, fuzzy_threshold=100)
+else:
+    item = keychain.item(args.item)
+
 if item is not None:
     print(item.password)
 else:
