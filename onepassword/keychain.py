@@ -1,5 +1,6 @@
 import json
 import os
+from fuzzywuzzy import process
 
 from onepassword.encryption_key import EncryptionKey
 
@@ -18,9 +19,15 @@ class Keychain(object):
         self._locked = not result
         return result
 
-    def item(self, name):
-        if name in self._items:
-            item = self._items[name]
+    def item(self, name, fuzzy_threshold=70):
+        """
+        Extract a password from an unlocked Keychain using fuzzy
+        matching. ``fuzzy_threshold`` can be an integer between 0 and
+        100, where 100 is an exact match.
+        """
+        extraction = process.extractOne(name, self._items.keys())
+        if extraction and extraction[1] >= fuzzy_threshold and extraction[0] in self._items:
+            item = self._items[extraction[0]]
             item.decrypt_with(self)
             return item
         else:
