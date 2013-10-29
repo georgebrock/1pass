@@ -18,7 +18,7 @@ setup(
     author_email="george.brocklehurst@gmail.com",
     description="A Python library and command line interface for 1Password",
     long_description=readme(),
-    install_requires=["simple-pbkdf2", "PyCrypto"],
+    install_requires=["simple-pbkdf2", "PyCrypto", "fuzzywuzzy"],
     license="MIT",
     url="http://github.com/georgebrock/1pass",
     classifiers=[],
