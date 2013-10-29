@@ -19,7 +19,7 @@ class Keychain(object):
         self._locked = not result
         return result
 
-    def item(self, name, fuzzy_threshold=70):
+    def item(self, name, fuzzy_threshold=100):
         """
         Extract a password from an unlocked Keychain using fuzzy
         matching. ``fuzzy_threshold`` can be an integer between 0 and
