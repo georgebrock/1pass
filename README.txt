@@ -23,8 +23,17 @@ Or, you can set your keychain path as an enviornment variable::
 
     1pass mail.google.com
 
-The name you pass on the command line must exactly match the name of an item in
-your 1Password keychain.
+By default, the name you pass on the command line will be fuzzily matched
+against the item in your 1Password keychain. For instance, the following
+will work::
+
+    1pass mail.goog
+
+To avoid this behavior and match the names exactly, use the ``--no-fuzz``
+flag::
+
+    1pass --no-fuzz mail.goog
+    Could not find a item named 'mail.goog'
 
 Python usage
 ============
