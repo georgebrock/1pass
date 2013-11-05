@@ -56,6 +56,7 @@ Contributors
 * Pip Taylor <https://github.com/pipt>
 * Adam Coddington <https://github.com/latestrevision>
 * Ash Berlin <https://github.com/ashb>
+* Zach Allaun <https://github.com/zachallaun>
 
 License
 =======
