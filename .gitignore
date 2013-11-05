@@ -2,3 +2,4 @@ ENV
 *.pyc
 dist
 1pass.egg-info
+build
