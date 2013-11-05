@@ -30,6 +30,13 @@ class IntegrationTest(TestCase):
         keychain.unlock("badger")
         self.assertEquals("flibble", keychain.item("Generic Account").password)
 
+    def test_unlock_and_read_with_fuzzy_matching(self):
+        keychain = Keychain(path=self.keychain_path)
+
+        keychain.unlock("badger")
+        item = keychain.item("foobr", fuzzy_threshold=70)
+        self.assertEquals("foobar", item.password)
+
     @property
     def keychain_path(self):
         return os.path.join(os.path.dirname(__file__), "data", "1Password.agilekeychain")
