@@ -25,9 +25,9 @@ class Keychain(object):
         matching. ``fuzzy_threshold`` can be an integer between 0 and
         100, where 100 is an exact match.
         """
-        extraction = process.extractOne(name, self._items.keys())
-        if extraction and extraction[1] >= fuzzy_threshold and extraction[0] in self._items:
-            item = self._items[extraction[0]]
+        exact_name, fuzzy_score = process.extractOne(name, self._items.keys())
+        if fuzzy_score >= fuzzy_threshold and exact_name in self._items:
+            item = self._items[exact_name]
             item.decrypt_with(self)
             return item
         else:
