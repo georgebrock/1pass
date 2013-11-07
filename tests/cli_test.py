@@ -13,11 +13,8 @@ class CLITest(TestCase):
 
     def test_cli_reading_web_form_password_with_multiple_password_attempts(self):
         password_attempts = (i for i in ("incorrect", "badger"))
-        cli = CLI(
+        cli = self.build_cli(
             getpass=lambda prompt: password_attempts.next(),
-            stdin=self.input,
-            stdout=self.output,
-            stderr=self.error,
             arguments=("--path", self.keychain_path, "onetosix",),
         )
         cli.run()
@@ -26,11 +23,8 @@ class CLITest(TestCase):
         self.assert_no_error_output()
 
     def test_cli_with_bad_item_name(self):
-        cli = CLI(
+        cli = self.build_cli(
             getpass=lambda prompt: "badger",
-            stdin=self.input,
-            stdout=self.output,
-            stderr=self.error,
             arguments=("--path", self.keychain_path, "onetos",),
         )
 
@@ -39,11 +33,8 @@ class CLITest(TestCase):
         self.assert_error_output("1pass: Could not find an item named 'onetos'\n")
 
     def test_cli_with_fuzzy_matching(self):
-        cli = CLI(
+        cli = self.build_cli(
             getpass=lambda prompt: "badger",
-            stdin=self.input,
-            stdout=self.output,
-            stderr=self.error,
             arguments=("--fuzzy", "--path", self.keychain_path, "onetos",),
         )
         cli.run()
@@ -54,11 +45,8 @@ class CLITest(TestCase):
     def test_cli_cancelled_password_prompt(self):
         def keyboard_interrupt(prompt):
             raise KeyboardInterrupt()
-        cli = CLI(
+        cli = self.build_cli(
             getpass=keyboard_interrupt,
-            stdin=self.input,
-            stdout=self.output,
-            stderr=self.error,
             arguments=("--path", self.keychain_path, "onetosix",),
         )
 
@@ -71,11 +59,8 @@ class CLITest(TestCase):
             self.fail("Password prompt was invoked")
         self.input.write("badger\n")
         self.input.seek(0)
-        cli = CLI(
+        cli = self.build_cli(
             getpass=flunker,
-            stdin=self.input,
-            stdout=self.output,
-            stderr=self.error,
             arguments=("--no-prompt", "--path", self.keychain_path, "onetosix",),
         )
         cli.run()
@@ -88,17 +73,23 @@ class CLITest(TestCase):
             self.fail("Password prompt was invoked")
         self.input.write("wrong-password\n")
         self.input.seek(0)
-        cli = CLI(
+        cli = self.build_cli(
             getpass=flunker,
-            stdin=self.input,
-            stdout=self.output,
-            stderr=self.error,
             arguments=("--no-prompt", "--path", self.keychain_path, "onetosix",),
         )
 
         self.assert_exit_status(os.EX_DATAERR, cli.run)
         self.assert_no_output()
         self.assert_error_output("1pass: Incorrect master password\n")
+
+    def build_cli(self, **kwargs):
+        cli_kwargs = {
+            "stdin": self.input,
+            "stdout": self.output,
+            "stderr": self.error,
+        }
+        cli_kwargs.update(kwargs)
+        return CLI(**cli_kwargs)
 
     def assert_exit_status(self, expected_status, func):
         try:
