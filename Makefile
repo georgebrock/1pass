@@ -1,3 +1,3 @@
 release:
-	git tag `ENV/bin/python setup.py --version`
+	git tag --sign `ENV/bin/python setup.py --version`
 	ENV/bin/python setup.py sdist upload
