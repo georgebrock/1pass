@@ -15,7 +15,7 @@ setup(
     name="1pass",
     version=VERSION,
     author="George Brocklehurst",
-    author_email="george.brocklehurst@gmail.com",
+    author_email="george@georgebrock.com",
     description="A Python library and command line interface for 1Password",
     long_description=readme(),
     install_requires=["simple-pbkdf2", "PyCrypto", "fuzzywuzzy"],
