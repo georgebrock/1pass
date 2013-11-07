@@ -6,4 +6,8 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import onepassword.cli
 
-onepassword.cli.CLI().run()
+try:
+    onepassword.cli.CLI().run()
+except Exception as e:
+    sys.stderr.write("1pass: Error: %s\n" % e.message)
+    sys.exit(1)
