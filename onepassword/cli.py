@@ -18,24 +18,19 @@ class CLI(object):
         self.stderr = stderr
         self.getpass = getpass
         self.arguments = self.argument_parser().parse_args(arguments)
+        self.keychain = Keychain(self.arguments.path)
 
     def run(self):
         """
         The main entry point, performs the appropriate action for the given
         arguments.
         """
-        keychain = Keychain(self.arguments.path)
-        while keychain.locked:
-            try:
-                keychain.unlock(self.getpass("Master password: "))
-            except KeyboardInterrupt:
-                self.stdout.write("\n")
-                sys.exit(0)
+        self._unlock_keychain()
 
-        if self.arguments.fuzzy:
-            item = keychain.item(self.arguments.item, fuzzy_threshold=70)
-        else:
-            item = keychain.item(self.arguments.item)
+        item = self.keychain.item(
+            self.arguments.item,
+            fuzzy_threshold=self._fuzzy_threshold(),
+        )
 
         if item is not None:
             self.stdout.write("%s\n" % item.password)
@@ -59,3 +54,17 @@ class CLI(object):
             help="Perform fuzzy matching on the item",
         )
         return parser
+
+    def _unlock_keychain(self):
+        while self.keychain.locked:
+            try:
+                self.keychain.unlock(self.getpass("Master password: "))
+            except KeyboardInterrupt:
+                self.stdout.write("\n")
+                sys.exit(0)
+
+    def _fuzzy_threshold(self):
+        if self.arguments.fuzzy:
+            return 70
+        else:
+            return 100
