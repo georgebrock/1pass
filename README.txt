@@ -29,6 +29,11 @@ made possible with the ``--fuzzy`` flag::
 
     1pass --fuzzy mail.goog
 
+If you don't want to be prompted for your password, you can use the
+``--no-prompt`` flag and provide the password via standard input instead::
+
+    emit_master_password | 1pass --no-prompt mail.google.com
+
 Python usage
 ============
 
@@ -49,6 +54,13 @@ I wrote this so I could add the following line to my ``.muttrc`` file::
 
 Now, whenever I start ``mutt``, I am prompted for my 1Password Master Password
 and not my Gmail password.
+
+The ``--no-prompt`` flag is very useful when configuring ``mutt`` and PGP.
+``mutt`` passes the PGP passphrase via standard in, so by inserting ``1pass``
+into this pipline I can use my 1Password master password when prompted for my
+PGP keyphrase::
+
+    set pgp_decrypt_command="1pass --no-prompt pgp-passphrase | gpg --passphrase-fd 0 ..."
 
 Contributors
 ============
