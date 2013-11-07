@@ -12,8 +12,9 @@ class CLI(object):
     The 1pass command line interface.
     """
 
-    def __init__(self, stdout=sys.stdout, stderr=sys.stderr,
+    def __init__(self, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr,
                  getpass=getpass.getpass, arguments=sys.argv[1:]):
+        self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.getpass = getpass
@@ -53,9 +54,27 @@ class CLI(object):
             action="store_true",
             help="Perform fuzzy matching on the item",
         )
+        parser.add_argument(
+            "--no-prompt",
+            action="store_true",
+            help="Don't prompt for a password, read from STDIN instead",
+        )
         return parser
 
     def _unlock_keychain(self):
+        if self.arguments.no_prompt:
+            self._unlock_keychain_stdin()
+        else:
+            self._unlock_keychain_prompt()
+
+    def _unlock_keychain_stdin(self):
+        password = self.stdin.read().strip()
+        self.keychain.unlock(password)
+        if self.keychain.locked:
+            self.stderr.write("1pass: Incorrect master password\n")
+            sys.exit(os.EX_DATAERR)
+
+    def _unlock_keychain_prompt(self):
         while self.keychain.locked:
             try:
                 self.keychain.unlock(self.getpass("Master password: "))

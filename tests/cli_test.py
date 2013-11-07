@@ -9,11 +9,13 @@ class CLITest(TestCase):
     def setUp(self):
         self.output = StringIO()
         self.error = StringIO()
+        self.input = StringIO()
 
     def test_cli_reading_web_form_password_with_multiple_password_attempts(self):
         password_attempts = (i for i in ("incorrect", "badger"))
         cli = CLI(
             getpass=lambda prompt: password_attempts.next(),
+            stdin=self.input,
             stdout=self.output,
             stderr=self.error,
             arguments=("--path", self.keychain_path, "onetosix",),
@@ -26,6 +28,7 @@ class CLITest(TestCase):
     def test_cli_with_bad_item_name(self):
         cli = CLI(
             getpass=lambda prompt: "badger",
+            stdin=self.input,
             stdout=self.output,
             stderr=self.error,
             arguments=("--path", self.keychain_path, "onetos",),
@@ -38,6 +41,7 @@ class CLITest(TestCase):
     def test_cli_with_fuzzy_matching(self):
         cli = CLI(
             getpass=lambda prompt: "badger",
+            stdin=self.input,
             stdout=self.output,
             stderr=self.error,
             arguments=("--fuzzy", "--path", self.keychain_path, "onetos",),
@@ -52,6 +56,7 @@ class CLITest(TestCase):
             raise KeyboardInterrupt()
         cli = CLI(
             getpass=keyboard_interrupt,
+            stdin=self.input,
             stdout=self.output,
             stderr=self.error,
             arguments=("--path", self.keychain_path, "onetosix",),
@@ -60,6 +65,40 @@ class CLITest(TestCase):
         self.assert_exit_status(0, cli.run)
         self.assert_output("\n")
         self.assert_no_error_output()
+
+    def test_correct_password_from_stdin(self):
+        def flunker(prompt):
+            self.fail("Password prompt was invoked")
+        self.input.write("badger\n")
+        self.input.seek(0)
+        cli = CLI(
+            getpass=flunker,
+            stdin=self.input,
+            stdout=self.output,
+            stderr=self.error,
+            arguments=("--no-prompt", "--path", self.keychain_path, "onetosix",),
+        )
+        cli.run()
+
+        self.assert_output("123456\n")
+        self.assert_no_error_output()
+
+    def test_incorrect_password_from_stdin(self):
+        def flunker(prompt):
+            self.fail("Password prompt was invoked")
+        self.input.write("wrong-password\n")
+        self.input.seek(0)
+        cli = CLI(
+            getpass=flunker,
+            stdin=self.input,
+            stdout=self.output,
+            stderr=self.error,
+            arguments=("--no-prompt", "--path", self.keychain_path, "onetosix",),
+        )
+
+        self.assert_exit_status(os.EX_DATAERR, cli.run)
+        self.assert_no_output()
+        self.assert_error_output("1pass: Incorrect master password\n")
 
     def assert_exit_status(self, expected_status, func):
         try:
