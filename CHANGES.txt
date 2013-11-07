@@ -1,5 +1,6 @@
 NEXT:
 * Added support for fuzzy matching (thanks to Zach Allaun)
+* Exit with EX_DATAERR (65) when a bad item name is given
 
 0.1.8:
 * Added support for GenericAccount passwords (thanks to Ash Berlin)

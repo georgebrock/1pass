@@ -6,4 +6,4 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import onepassword.cli
 
-onepassword.cli.CLI(sys.argv[1:]).run()
+onepassword.cli.CLI().run()
