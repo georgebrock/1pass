@@ -87,7 +87,7 @@ class KeychainItem(object):
         name = row[2]
         if type == "webforms.WebForm":
             return WebFormKeychainItem(identifier, name, path, type)
-        elif type == "passwords.Password" or type == "wallet.onlineservices.GenericAccount":
+        elif type == "passwords.Password" or type == "wallet.onlineservices.GenericAccount" or type == "wallet.computer.UnixServer":
             return PasswordKeychainItem(identifier, name, path, type)
         else:
             return KeychainItem(identifier, name, path, type)
