@@ -1,3 +1,6 @@
+0.2.1:
+* Fix pbkdf2 overflow bug by switching to M2Crypto.
+
 0.2.0:
 * Added support for fuzzy matching (thanks to Zach Allaun)
 * Exit with EX_DATAERR (65) when a bad item name is given
