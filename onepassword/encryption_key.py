@@ -1,7 +1,7 @@
 from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Hash import MD5
-from pbkdf2 import pbkdf2_bin
+from M2Crypto import EVP
 
 
 class SaltyString(object):
@@ -32,6 +32,7 @@ class EncryptionKey(object):
 
     def unlock(self, password):
         key, iv = self._derive_pbkdf2(password)
+
         self._decrypted_key = self._aes_decrypt(
             key=key,
             iv=iv,
@@ -62,11 +63,11 @@ class EncryptionKey(object):
             return decrypted[:-padding_size]
 
     def _derive_pbkdf2(self, password):
-        key_and_iv = pbkdf2_bin(
+        key_and_iv = EVP.pbkdf2(
             password,
             self._encrypted_key.salt,
             self.iterations,
-            keylen=32,
+            32,
         )
         return (
             key_and_iv[0:16],
