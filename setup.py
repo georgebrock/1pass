@@ -18,7 +18,7 @@ setup(
     author_email="george@georgebrock.com",
     description="A Python library and command line interface for 1Password",
     long_description=readme(),
-    install_requires=["M2Crypto", "PyCrypto", "fuzzywuzzy"],
+    install_requires=["M2Crypto", "fuzzywuzzy"],
     license="MIT",
     url="http://github.com/georgebrock/1pass",
     classifiers=[],

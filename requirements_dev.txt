@@ -1,5 +1,4 @@
 mock
 nose
 M2Crypto
-pycrypto
 fuzzywuzzy

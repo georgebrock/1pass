@@ -1,8 +1,6 @@
 from base64 import b64decode
-from Crypto.Cipher import AES
-from Crypto.Hash import MD5
+from hashlib import md5
 from M2Crypto import EVP
-
 
 class SaltyString(object):
     SALTED_PREFIX = "Salted__"
@@ -52,8 +50,8 @@ class EncryptionKey(object):
         return self.decrypt(self._validation) == self._decrypted_key
 
     def _aes_decrypt(self, key, iv, encrypted_data):
-        aes = AES.new(key, mode=AES.MODE_CBC, IV=iv)
-        return self._strip_padding(aes.decrypt(encrypted_data))
+        aes = EVP.Cipher("aes_128_cbc", key, iv, key_as_bytes=False, padding=False, op=0)
+        return self._strip_padding(aes.update(encrypted_data) + aes.final())
 
     def _strip_padding(self, decrypted):
         padding_size = ord(decrypted[-1])
@@ -79,7 +77,7 @@ class EncryptionKey(object):
         key_and_iv = ""
         prev = ""
         while len(key_and_iv) < 32:
-            prev = MD5.new(prev + key + salt).digest()
+            prev = md5(prev + key + salt).digest()
             key_and_iv += prev
         return (
             key_and_iv[0:16],

@@ -69,6 +69,7 @@ Contributors
 * Adam Coddington <https://github.com/latestrevision>
 * Ash Berlin <https://github.com/ashb>
 * Zach Allaun <https://github.com/zachallaun>
+* Eric Mika <https://github.com/kitschpatrol>
 
 License
 =======
