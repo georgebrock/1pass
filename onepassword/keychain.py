@@ -114,7 +114,7 @@ class KeychainItem(object):
         )
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
-        self._data = json.loads(decrypted_json)
+        self._data = json.loads(decrypted_json.replace('\x10',''))
         self.password = self._find_password()
 
     def _find_password(self):
