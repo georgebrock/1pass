@@ -7,7 +7,7 @@ VERSION = "0.2.1"
 
 def readme():
     """ Load the contents of the README file """
-    readme_path = os.path.join(os.path.dirname(__file__), "README.txt")
+    readme_path = os.path.join(os.path.dirname(__file__), "README.rst")
     with open(readme_path, "r") as f:
         return f.read()
 
