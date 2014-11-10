@@ -23,7 +23,7 @@ setup(
     url="http://github.com/georgebrock/1pass",
     classifiers=[],
     packages=["onepassword"],
-    scripts=["bin/1pass"],
+    entry_points={'console_scripts': ['1pass=onepassword.cli:cli']},
 
     tests_require=["nose", "mock"],
     test_suite="nose.collector",
