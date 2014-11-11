@@ -60,6 +60,8 @@ class Keychain(object):
 
     def _load_encryption_keys(self):
         path = os.path.join(self._path, "data", "default", "encryptionKeys.js")
+        if not os.path.exists(path):
+            raise Exception('No KeyChain could be found at: {}'.format(self._path))
         with open(path, "r") as f:
             key_data = json.load(f)
 
