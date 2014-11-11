@@ -21,7 +21,7 @@ def cli(item, path, fuzzy, no_prompt):
         password = sys.stdin.read().strip()
         keychain.unlock(password)
         if keychain.locked:
-            sys.stderr.write("1pass: Incorrect master password\n")
+            click.echo("1pass: Incorrect master password", err=True)
             sys.exit(os.EX_DATAERR)
     else:
         while keychain.locked:
@@ -34,7 +34,7 @@ def cli(item, path, fuzzy, no_prompt):
     found_item = keychain.item(item, 70 if fuzzy else 100)
 
     if found_item is not None:
-        sys.stdout.write("%s\n" % found_item.password)
+        click.echo(found_item.password)
     else:
-        sys.stderr.write("1pass: Could not find an item named '%s'\n" % (item))
+        click.echo("1pass: Could not find an item named '%s'" % (item), err=True)
         sys.exit(os.EX_DATAERR)
