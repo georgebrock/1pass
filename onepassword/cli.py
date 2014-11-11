@@ -25,11 +25,7 @@ def cli(item, path, fuzzy, no_prompt):
             sys.exit(os.EX_DATAERR)
     else:
         while keychain.locked:
-            try:
-                keychain.unlock(getpass("Master password: "))
-            except KeyboardInterrupt:
-                sys.stdout.write("\n")
-                sys.exit(0)
+            keychain.unlock(getpass.getpass("Master password: "))
 
     found_item = keychain.item(item, 70 if fuzzy else 100)
 
