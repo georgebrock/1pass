@@ -31,10 +31,10 @@ def cli(item, path, fuzzy, no_prompt):
                 sys.stdout.write("\n")
                 sys.exit(0)
 
-    item = keychain.item(item, 70 if fuzzy else 100)
+    found_item = keychain.item(item, 70 if fuzzy else 100)
 
-    if item is not None:
-        sys.stdout.write("%s\n" % item.password)
+    if found_item is not None:
+        sys.stdout.write("%s\n" % found_item.password)
     else:
         sys.stderr.write("1pass: Could not find an item named '%s'\n" % (item))
         sys.exit(os.EX_DATAERR)
