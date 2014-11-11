@@ -3,3 +3,4 @@ ENV
 dist
 1pass.egg-info
 build
+bin
