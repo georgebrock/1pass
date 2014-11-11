@@ -97,7 +97,7 @@ class KeychainItem(object):
     def __init__(self, identifier, name, path, type):
         self.identifier = identifier
         self.name = name
-        self.password = None
+        self.results = None
         self._path = path
         self._type = type
 
@@ -117,7 +117,7 @@ class KeychainItem(object):
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
         self._data = json.loads(decrypted_json)
-        self.password = self._find_password()
+        self.results = self._find_password()
 
     def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
@@ -141,19 +141,34 @@ class KeychainItem(object):
 
 class WebFormKeychainItem(KeychainItem):
     def _find_password(self):
+        r = {}
+        #print(self._data)
         for field in self._data["fields"]:
             if field.get("designation") == "password" or \
                field.get("name") == "Password":
-                return field["value"]
+                r["PASSWORD"] = field["value"]
+            if field.get("designation") == "username" or \
+               field.get("name") == "Username":
+                r["USERNAME"] = field["value"]
+        return r
 
 
 class PasswordKeychainItem(KeychainItem):
     def _find_password(self):
-        return self._data["password"]
+        r = {}
+        if self._data["username"] != "":
+            r["USERNAME"] = self._data["username"]
+        if self._data["url"] != "":
+            r["URL"] = self._data["url"]
+        r["PASSWORD"] = self._data["password"]
+        return r
 
 class UnixServerKeychainItem(KeychainItem):
     def _find_password(self):
-        r = ""
+        r = {}
         if self._data["username"] != "":
-            r = self._data["username"] + ":"
-        return r + self._data["password"]
+            r["USERNAME"] = self._data["username"]
+        if self._data["url"] != "":
+            r["URL"] = self._data["url"]
+        r["PASSWORD"] = self._data["password"]
+        return r
