@@ -39,6 +39,11 @@ class KeychainTest(TestCase):
         return os.path.join(os.path.dirname(__file__), "data", "1Password.agilekeychain")
 
 
+class KeychainURLTest(KeychainTest):
+    @property
+    def data_path(self):
+        return 'https://raw.githubusercontent.com/georgebrock/1pass/8dbfa5e062ce08e26c5619dbdb2b27323e5b3dc9/tests/data/1Password.agilekeychain'
+
 class KeychainItemTest(TestCase):
     def test_initialisation_with_contents_data(self):
         item = KeychainItem.build(self.example_row, path=self.data_path)
