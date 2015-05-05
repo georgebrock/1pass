@@ -9,5 +9,5 @@ import onepassword.cli
 try:
     onepassword.cli.CLI().run()
 except Exception as e:
-    sys.stderr.write("1pass: Error: %s\n" % e.message)
+    sys.stderr.write("1pass: Error: %s\n" % e)
     sys.exit(1)
