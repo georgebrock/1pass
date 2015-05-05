@@ -38,24 +38,27 @@ class EncryptionKey(object):
         )
         return self._validate_decrypted_key()
 
-    def decrypt(self, b64_data):
+    def _decrypt(self, b64_data):
         encrypted = SaltyString(b64_data)
         key, iv = self._derive_openssl(self._decrypted_key, encrypted.salt)
         return self._aes_decrypt(key=key, iv=iv, encrypted_data=encrypted.data)
+
+    def decrypt(self, b64_data):
+        return self._strip_padding(self._decrypt(b64_data))
 
     def _set_iterations(self, iterations):
         self.iterations = max(int(iterations), self.MINIMUM_ITERATIONS)
 
     def _validate_decrypted_key(self):
-        return self.decrypt(self._validation) == self._decrypted_key
+        return self._decrypt(self._validation) == self._decrypted_key
 
     def _aes_decrypt(self, key, iv, encrypted_data):
         aes = EVP.Cipher("aes_128_cbc", key, iv, key_as_bytes=False, padding=False, op=0)
-        return self._strip_padding(aes.update(encrypted_data) + aes.final())
+        return aes.update(encrypted_data) + aes.final()
 
     def _strip_padding(self, decrypted):
         padding_size = ord(decrypted[-1])
-        if padding_size >= 16:
+        if padding_size > 16:
             return decrypted
         else:
             return decrypted[:-padding_size]
