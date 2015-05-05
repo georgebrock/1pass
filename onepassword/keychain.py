@@ -1,8 +1,16 @@
 import json
 import os
+from urllib2 import urlopen
 from fuzzywuzzy import process
 
 from onepassword.encryption_key import EncryptionKey
+
+def _json_load(path):
+    if path.startswith('http://') or path.startswith('https://'):
+        return json.load(urlopen(path, 'r'))
+    else:
+        with open(path, 'r') as f:
+            return json.load(f)
 
 
 class Keychain(object):
@@ -60,8 +68,7 @@ class Keychain(object):
 
     def _load_encryption_keys(self):
         path = os.path.join(self._path, "data", "default", "encryptionKeys.js")
-        with open(path, "r") as f:
-            key_data = json.load(f)
+        key_data = _json_load(path)
 
         self._encryption_keys = {}
         for key_definition in key_data["list"]:
@@ -70,8 +77,7 @@ class Keychain(object):
 
     def _load_item_list(self):
         path = os.path.join(self._path, "data", "default", "contents.js")
-        with open(path, "r") as f:
-            item_list = json.load(f)
+        item_list = _json_load(path)
 
         self._items = {}
         for item_definition in item_list:
@@ -129,8 +135,7 @@ class KeychainItem(object):
     def _read_data_file(self):
         filename = "%s.1password" % self.identifier
         path = os.path.join(self._path, "data", "default", filename)
-        with open(path, "r") as f:
-            item_data = json.load(f)
+        item_data = _json_load(path)
 
         self._key_identifier = item_data.get("keyID")
         self._security_level = item_data.get("securityLevel")
