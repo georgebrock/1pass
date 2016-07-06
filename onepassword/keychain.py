@@ -13,9 +13,7 @@ class Keychain(object):
         self._locked = True
 
     def unlock(self, password):
-        unlocker = lambda key: key.unlock(password)
-        unlock_results = map(unlocker, self._encryption_keys.values())
-        result = reduce(lambda x, y: x and y, unlock_results)
+        result = all([key.unlock(password) for key in self._encryption_keys.values()])
         self._locked = not result
         return result
 
