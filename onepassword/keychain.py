@@ -1,5 +1,6 @@
 import json
 import os
+import functools
 from fuzzywuzzy import process
 
 from onepassword.encryption_key import EncryptionKey
@@ -13,9 +14,11 @@ class Keychain(object):
         self._locked = True
 
     def unlock(self, password):
-        unlocker = lambda key: key.unlock(password)
+        def unlocker(key):
+            return key.unlock(password)
+
         unlock_results = map(unlocker, self._encryption_keys.values())
-        result = reduce(lambda x, y: x and y, unlock_results)
+        result = functools.reduce(lambda x, y: x and y, unlock_results)
         self._locked = not result
         return result
 
@@ -114,6 +117,7 @@ class KeychainItem(object):
         )
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
+
         self._data = json.loads(decrypted_json)
         self.password = self._find_password()
 

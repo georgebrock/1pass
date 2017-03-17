@@ -1,6 +1,9 @@
 from base64 import b64decode
 from hashlib import md5
-from M2Crypto import EVP
+
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Cipher import AES
+
 
 class SaltyString(object):
     SALTED_PREFIX = "Salted__"
@@ -23,6 +26,7 @@ class EncryptionKey(object):
                  level=None):
         self.identifier = identifier
         self.level = level
+
         self._encrypted_key = SaltyString(data)
         self._decrypted_key = None
         self._set_iterations(iterations)
@@ -50,8 +54,8 @@ class EncryptionKey(object):
         return self.decrypt(self._validation) == self._decrypted_key
 
     def _aes_decrypt(self, key, iv, encrypted_data):
-        aes = EVP.Cipher("aes_128_cbc", key, iv, key_as_bytes=False, padding=False, op=0)
-        return self._strip_padding(aes.update(encrypted_data) + aes.final())
+        aes = AES.new(key, AES.MODE_CBC, iv)
+        return self._strip_padding(aes.decrypt(encrypted_data))
 
     def _strip_padding(self, decrypted):
         padding_size = ord(decrypted[-1])
@@ -61,11 +65,11 @@ class EncryptionKey(object):
             return decrypted[:-padding_size]
 
     def _derive_pbkdf2(self, password):
-        key_and_iv = EVP.pbkdf2(
+        key_and_iv = PBKDF2(
             password,
             self._encrypted_key.salt,
-            self.iterations,
             32,
+            self.iterations,
         )
         return (
             key_and_iv[0:16],
@@ -74,8 +78,8 @@ class EncryptionKey(object):
 
     def _derive_openssl(self, key, salt):
         key = key[0:-16]
-        key_and_iv = ""
-        prev = ""
+        key_and_iv = b""
+        prev = b""
         while len(key_and_iv) < 32:
             prev = md5(prev + key + salt).digest()
             key_and_iv += prev
