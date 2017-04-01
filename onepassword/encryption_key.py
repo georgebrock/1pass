@@ -1,16 +1,18 @@
 from base64 import b64decode
-from hashlib import md5
+from hashlib import md5, pbkdf2_hmac
 
-from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Cipher import AES
+
+from .utils import is_python_3
 
 
 class SaltyString(object):
-    SALTED_PREFIX = "Salted__"
-    ZERO_INIT_VECTOR = "\x00" * 16
+    SALTED_PREFIX = b"Salted__"
+    ZERO_INIT_VECTOR = b"\x00" * 16
 
     def __init__(self, base64_encoded_string):
         decoded_data = b64decode(base64_encoded_string)
+
         if decoded_data.startswith(self.SALTED_PREFIX):
             self.salt = decoded_data[8:16]
             self.data = decoded_data[16:]
@@ -58,6 +60,9 @@ class EncryptionKey(object):
         return self._strip_padding(aes.decrypt(encrypted_data))
 
     def _strip_padding(self, decrypted):
+        if is_python_3():
+            return decrypted.rstrip()
+
         padding_size = ord(decrypted[-1])
         if padding_size >= 16:
             return decrypted
@@ -65,11 +70,14 @@ class EncryptionKey(object):
             return decrypted[:-padding_size]
 
     def _derive_pbkdf2(self, password):
-        key_and_iv = PBKDF2(
-            password,
-            self._encrypted_key.salt,
-            32,
-            self.iterations,
+        # Use hashlib.pbkdf2_hmac, which is significantly faster
+        # than Crypto.Protocol.KDF.PBKDF2
+        key_and_iv = pbkdf2_hmac(
+            'sha1',                     # hash type
+            password.encode(),          # password
+            self._encrypted_key.salt,   # salt
+            self.iterations,            # iterations
+            32                          # length of key
         )
         return (
             key_and_iv[0:16],

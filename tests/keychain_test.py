@@ -15,8 +15,8 @@ class KeychainTest(TestCase):
     def test_key_by_security_level(self):
         keychain = Keychain(self.data_path)
         key = keychain.key(security_level="SL5")
-        self.assertEquals("525E210E0B4C49799D7E47DD8E789C78", key.identifier)
-        self.assertEquals("SL5", key.level)
+        self.assertEqual("525E210E0B4C49799D7E47DD8E789C78", key.identifier)
+        self.assertEqual("SL5", key.level)
 
     def test_key_by_id_with_bad_security_level(self):
         keychain = Keychain(self.data_path)
@@ -26,8 +26,8 @@ class KeychainTest(TestCase):
     def test_key_by_id(self):
         keychain = Keychain(self.data_path)
         key = keychain.key(identifier="525E210E0B4C49799D7E47DD8E789C78")
-        self.assertEquals("525E210E0B4C49799D7E47DD8E789C78", key.identifier)
-        self.assertEquals("SL5", key.level)
+        self.assertEqual("525E210E0B4C49799D7E47DD8E789C78", key.identifier)
+        self.assertEqual("SL5", key.level)
 
     def test_key_by_id_with_bad_id(self):
         keychain = Keychain(self.data_path)
@@ -42,12 +42,12 @@ class KeychainTest(TestCase):
 class KeychainItemTest(TestCase):
     def test_initialisation_with_contents_data(self):
         item = KeychainItem.build(self.example_row, path=self.data_path)
-        self.assertEquals("onetosix", item.name)
-        self.assertEquals("CEA5EA6531FC4BE9B7D7F89B5BB18B66", item.identifier)
+        self.assertEqual("onetosix", item.name)
+        self.assertEqual("CEA5EA6531FC4BE9B7D7F89B5BB18B66", item.identifier)
 
     def test_key_identifier(self):
         item = KeychainItem.build(self.example_row, path=self.data_path)
-        self.assertEquals("525E210E0B4C49799D7E47DD8E789C78", item.key_identifier)
+        self.assertEqual("525E210E0B4C49799D7E47DD8E789C78", item.key_identifier)
 
     def test_security_level(self):
         item = KeychainItem.build(
@@ -55,7 +55,7 @@ class KeychainItemTest(TestCase):
                 "example.com", 12345, "", 0, "N"],
             path=self.data_path,
         )
-        self.assertEquals("SL5", item.security_level)
+        self.assertEqual("SL5", item.security_level)
 
     def test_decrypt(self):
         mock_key = Mock()
@@ -69,7 +69,7 @@ class KeychainItemTest(TestCase):
 
         self.assertIsNone(item.password)
         item.decrypt_with(mock_keychain)
-        self.assertEquals("abcdef", item.password)
+        self.assertEqual("abcdef", item.password)
 
     @property
     def data_path(self):

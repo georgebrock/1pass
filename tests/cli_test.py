@@ -1,6 +1,10 @@
 import os
 from unittest import TestCase
-from StringIO import StringIO
+# Python 2+3 compatibilty
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from onepassword.cli import CLI
 
@@ -14,9 +18,10 @@ class CLITest(TestCase):
     def test_cli_reading_web_form_password_with_multiple_password_attempts(self):
         password_attempts = (i for i in ("incorrect", "badger"))
         cli = self.build_cli(
-            getpass=lambda prompt: password_attempts.next(),
+            getpass=lambda prompt: next(password_attempts),
             arguments=("--path", self.keychain_path, "onetosix",),
         )
+
         cli.run()
 
         self.assert_output("123456\n")
@@ -95,18 +100,18 @@ class CLITest(TestCase):
         try:
             func()
         except SystemExit as exit:
-            self.assertEquals(expected_status, exit.code)
+            self.assertEqual(expected_status, exit.code)
         else:
             self.fail("Expected a SystemExit to be raised")
 
     def assert_output(self, expected_output):
-        self.assertEquals(expected_output, self.output.getvalue())
+        self.assertEqual(expected_output, self.output.getvalue())
 
     def assert_no_output(self):
         self.assert_output("")
 
     def assert_error_output(self, expected_output):
-        self.assertEquals(expected_output, self.error.getvalue())
+        self.assertEqual(expected_output, self.error.getvalue())
 
     def assert_no_error_output(self):
         self.assert_error_output("")

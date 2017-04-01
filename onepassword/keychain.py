@@ -19,7 +19,6 @@ class Keychain(object):
 
         unlock_results = map(unlocker, self._encryption_keys.values())
         result = functools.reduce(lambda x, y: x and y, unlock_results)
-
         self._locked = not result
         return result
 
@@ -118,6 +117,9 @@ class KeychainItem(object):
         )
         encrypted_json = self._lazily_load("_encrypted_json")
         decrypted_json = key.decrypt(self._encrypted_json)
+
+        if isinstance(decrypted_json, bytes):
+            decrypted_json = decrypted_json.decode('utf-8')
 
         self._data = json.loads(decrypted_json)
         self.password = self._find_password()

@@ -15,27 +15,27 @@ class IntegrationTest(TestCase):
         self.assertTrue(unlock_result)
 
         self.assertIsNone(keychain.item("does-not-exist"))
-        self.assertEquals("123456", keychain.item("onetosix").password)
-        self.assertEquals("abcdef", keychain.item("atof").password)
+        self.assertEqual("123456", keychain.item("onetosix").password)
+        self.assertEqual("abcdef", keychain.item("atof").password)
 
     def test_unlock_and_read_generated_password(self):
         keychain = Keychain(path=self.keychain_path)
 
         keychain.unlock("badger")
-        self.assertEquals("foobar", keychain.item("foobar").password)
+        self.assertEqual("foobar", keychain.item("foobar").password)
 
     def test_unlock_and_read_generic_account_password(self):
         keychain = Keychain(path=self.keychain_path)
 
         keychain.unlock("badger")
-        self.assertEquals("flibble", keychain.item("Generic Account").password)
+        self.assertEqual("flibble", keychain.item("Generic Account").password)
 
     def test_unlock_and_read_with_fuzzy_matching(self):
         keychain = Keychain(path=self.keychain_path)
 
         keychain.unlock("badger")
         item = keychain.item("foobr", fuzzy_threshold=70)
-        self.assertEquals("foobar", item.password)
+        self.assertEqual("foobar", item.password)
 
     @property
     def keychain_path(self):
