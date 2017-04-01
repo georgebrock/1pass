@@ -19,6 +19,7 @@ class Keychain(object):
 
         unlock_results = map(unlocker, self._encryption_keys.values())
         result = functools.reduce(lambda x, y: x and y, unlock_results)
+
         self._locked = not result
         return result
 
