@@ -3,8 +3,8 @@ import os
 import functools
 from fuzzywuzzy import process
 
-from onepassword.encryption_key import EncryptionKey
 
+from onepassword.encryption_key import EncryptionKey
 
 class Keychain(object):
     def __init__(self, path):
@@ -21,6 +21,9 @@ class Keychain(object):
         result = functools.reduce(lambda x, y: x and y, unlock_results)
         self._locked = not result
         return result
+
+    def get_items(self):
+        return self._items.keys()
 
     def item(self, name, fuzzy_threshold=100):
         """
@@ -99,6 +102,7 @@ class KeychainItem(object):
         self.identifier = identifier
         self.name = name
         self.password = None
+        self.username = None
         self._path = path
         self._type = type
 
@@ -123,9 +127,14 @@ class KeychainItem(object):
 
         self._data = json.loads(decrypted_json)
         self.password = self._find_password()
+        self.username = self._find_username()
 
     def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
+                        " keychain item (%s)" % self._type)
+
+    def _find_username(self):
+        raise Exception("Cannot extract a username from this type of"
                         " keychain item (%s)" % self._type)
 
     def _lazily_load(self, attr):
@@ -143,7 +152,6 @@ class KeychainItem(object):
         self._security_level = item_data.get("securityLevel")
         self._encrypted_json = item_data["encrypted"]
 
-
 class WebFormKeychainItem(KeychainItem):
     def _find_password(self):
         for field in self._data["fields"]:
@@ -151,7 +159,16 @@ class WebFormKeychainItem(KeychainItem):
                field.get("name") == "Password":
                 return field["value"]
 
+    def _find_username(self):
+        for field in self._data["fields"]:
+            if field.get("designation") == "username" or \
+               field.get("name") == "username":
+                return field["value"]
+
 
 class PasswordKeychainItem(KeychainItem):
     def _find_password(self):
         return self._data["password"]
+
+    def _find_username(self):
+        return self._data["username"]
