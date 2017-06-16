@@ -92,6 +92,8 @@ class KeychainItem(object):
             return WebFormKeychainItem(identifier, name, path, type)
         elif type == "passwords.Password" or type == "wallet.onlineservices.GenericAccount":
             return PasswordKeychainItem(identifier, name, path, type)
+        elif type == "wallet.computer.UnixServer":
+            return UnixServerKeychainItem(identifier, name, path, type)
         else:
             return KeychainItem(identifier, name, path, type)
 
@@ -153,5 +155,9 @@ class WebFormKeychainItem(KeychainItem):
 
 
 class PasswordKeychainItem(KeychainItem):
+    def _find_password(self):
+        return self._data["password"]
+
+class UnixServerKeychainItem(KeychainItem):
     def _find_password(self):
         return self._data["password"]
