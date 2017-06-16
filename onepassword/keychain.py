@@ -92,13 +92,15 @@ class KeychainItem(object):
             return WebFormKeychainItem(identifier, name, path, type)
         elif type == "passwords.Password" or type == "wallet.onlineservices.GenericAccount":
             return PasswordKeychainItem(identifier, name, path, type)
+        elif type == "wallet.computer.UnixServer":
+            return UnixServerKeychainItem(identifier, name, path, type)
         else:
             return KeychainItem(identifier, name, path, type)
 
     def __init__(self, identifier, name, path, type):
         self.identifier = identifier
         self.name = name
-        self.password = None
+        self.results = None
         self._path = path
         self._type = type
 
@@ -122,7 +124,7 @@ class KeychainItem(object):
             decrypted_json = decrypted_json.decode('utf-8')
 
         self._data = json.loads(decrypted_json)
-        self.password = self._find_password()
+        self.results = self._find_password()
 
     def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
@@ -146,12 +148,34 @@ class KeychainItem(object):
 
 class WebFormKeychainItem(KeychainItem):
     def _find_password(self):
+        r = {}
+        #print(self._data)
         for field in self._data["fields"]:
             if field.get("designation") == "password" or \
                field.get("name") == "Password":
-                return field["value"]
+                r["PASSWORD"] = field["value"]
+            if field.get("designation") == "username" or \
+               field.get("name") == "Username":
+                r["USERNAME"] = field["value"]
+        return r
 
 
 class PasswordKeychainItem(KeychainItem):
     def _find_password(self):
-        return self._data["password"]
+        r = {}
+        if self._data["username"] != "":
+            r["USERNAME"] = self._data["username"]
+        if self._data["url"] != "":
+            r["URL"] = self._data["url"]
+        r["PASSWORD"] = self._data["password"]
+        return r
+
+class UnixServerKeychainItem(KeychainItem):
+    def _find_password(self):
+        r = {}
+        if self._data["username"] != "":
+            r["USERNAME"] = self._data["username"]
+        if self._data["url"] != "":
+            r["URL"] = self._data["url"]
+        r["PASSWORD"] = self._data["password"]
+        return r

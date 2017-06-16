@@ -34,7 +34,14 @@ class CLI(object):
         )
 
         if item is not None:
-            self.stdout.write("%s\n" % item.password)
+            if self.arguments.output_shell:
+                # output to shell; output username, password, urls
+                self.stdout.write("ITEMNAME='%s'\n" % (item.name.replace("'", "'\\''")))
+                for key, value in item.results.iteritems():
+                    self.stdout.write("%s='%s'\n" % (key,value.replace("'", "'\\''")))
+            else:
+                # only output password
+                self.stdout.write("%s\n" % item.results["PASSWORD"])
         else:
             self.stderr.write("1pass: Could not find an item named '%s'\n" % (
                 self.arguments.item,
@@ -57,8 +64,13 @@ class CLI(object):
         parser.add_argument(
             "--no-prompt",
             action="store_true",
-            help="Don't prompt for a password, read from STDIN instead",
+            help="Don't prompt for a password, read from STDIN or ONEPASSWORD_PASSWORD environment variable instead",
         )
+        parser.add_argument(
+            "--output-shell",
+            action="store_true",
+            help="Output username, password, and urls as shell variables; USERNAME=, PASSWORD=, URLS=(url1 url2), etc"
+        )        
         return parser
 
     def _unlock_keychain(self):
@@ -68,7 +80,9 @@ class CLI(object):
             self._unlock_keychain_prompt()
 
     def _unlock_keychain_stdin(self):
-        password = self.stdin.read().strip()
+        password=os.environ.get('ONEPASSWORD_PASSWORD', None )
+        if password is None:
+            password = self.stdin.read().strip()
         self.keychain.unlock(password)
         if self.keychain.locked:
             self.stderr.write("1pass: Incorrect master password\n")
