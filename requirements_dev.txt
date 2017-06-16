@@ -1,4 +1,5 @@
 mock
 nose
-M2Crypto
 fuzzywuzzy
+pycrypto
+pbkdf2

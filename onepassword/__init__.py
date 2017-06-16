@@ -1,1 +1,1 @@
-from keychain import Keychain
+from .keychain import Keychain

@@ -1,4 +1,4 @@
-from base64 import b64encode, b64decode
+from base64 import b64encode
 from unittest import TestCase
 
 from onepassword.encryption_key import SaltyString, EncryptionKey
@@ -6,40 +6,40 @@ from onepassword.encryption_key import SaltyString, EncryptionKey
 
 class SaltyStringTest(TestCase):
     def test_unsalted_data(self):
-        unsalted = SaltyString(b64encode("Unsalted data"))
-        self.assertEquals("\x00" * 16, unsalted.salt)
-        self.assertEquals("Unsalted data", unsalted.data)
+        unsalted = SaltyString(b64encode(b"Unsalted data"))
+        self.assertEqual(b"\x00" * 16, unsalted.salt)
+        self.assertEqual(b"Unsalted data", unsalted.data)
 
     def test_salted_data(self):
-        salted = SaltyString(b64encode("Salted__SSSSSSSSDDDDDDDD"))
-        self.assertEquals("SSSSSSSS", salted.salt)
-        self.assertEquals("DDDDDDDD", salted.data)
+        salted = SaltyString(b64encode(b"Salted__SSSSSSSSDDDDDDDD"))
+        self.assertEqual(b"SSSSSSSS", salted.salt)
+        self.assertEqual(b"DDDDDDDD", salted.data)
 
 
 class EncryptionKeyTest(TestCase):
     def test_identifier(self):
         key = EncryptionKey(data="", identifier="ABC123")
-        self.assertEquals("ABC123", key.identifier)
+        self.assertEqual("ABC123", key.identifier)
 
     def test_level(self):
         key = EncryptionKey(data="", level="SL3")
-        self.assertEquals("SL3", key.level)
+        self.assertEqual("SL3", key.level)
 
     def test_iterations_with_string(self):
         key = EncryptionKey(data="", iterations="40000")
-        self.assertEquals(40000, key.iterations)
+        self.assertEqual(40000, key.iterations)
 
     def test_iterations_with_number(self):
         key = EncryptionKey(data="", iterations=5000)
-        self.assertEquals(5000, key.iterations)
+        self.assertEqual(5000, key.iterations)
 
     def test_iterations_default(self):
         key = EncryptionKey(data="")
-        self.assertEquals(1000, key.iterations)
+        self.assertEqual(1000, key.iterations)
 
     def test_iterations_minimum(self):
         key = EncryptionKey(data="", iterations=500)
-        self.assertEquals(1000, key.iterations)
+        self.assertEqual(1000, key.iterations)
 
     def test_unlocking_with_correct_password(self):
         key = EncryptionKey(**self.example_data)
