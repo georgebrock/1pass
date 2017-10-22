@@ -1,6 +1,7 @@
 import argparse
 import getpass
 import os
+import pyperclip
 import sys
 
 from onepassword import Keychain
@@ -34,12 +35,18 @@ class CLI(object):
         )
 
         if item is not None:
-            self.stdout.write("%s\n" % item.password)
+            self.produce(item)
         else:
             self.stderr.write("1pass: Could not find an item named '%s'\n" % (
                 self.arguments.item,
             ))
             sys.exit(os.EX_DATAERR)
+
+    def produce(self, item):
+        if self.arguments.copy:
+            pyperclip.copy(item.password)
+        else:
+            self.stdout.write("%s\n" % item.password)
 
     def argument_parser(self):
         parser = argparse.ArgumentParser()
@@ -59,6 +66,12 @@ class CLI(object):
             action="store_true",
             help="Don't prompt for a password, read from STDIN instead",
         )
+        parser.add_argument(
+            "-c", "--copy",
+            action="store_true",
+            help="Copy the password to the clipboard, instead of printing it",
+        )
+
         return parser
 
     def _unlock_keychain(self):

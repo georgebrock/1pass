@@ -34,6 +34,11 @@ If you don't want to be prompted for your password, you can use the
 
     emit_master_password | 1pass --no-prompt mail.google.com
 
+If you want to copy the password to the clipboard, instead of printing
+it to the screen, use:
+
+    1pass -c mail.google.com
+
 Python usage
 ============
 
