@@ -45,6 +45,18 @@ The interface is very simple::
     my_keychain.unlock("my-master-password")
     my_keychain.item("An item's name").password
 
+Installation
+============
+
+The easiest way to install for normal usage is probably to use pip.
+
+	pip install 1pass
+
+Afterwords you should be able to use 1pass from the terminal.
+
+The command requires pip to be installed and might require you to use sudo or run the
+command as a user with admin privileges depending on your setup.
+
 An example of real-world use
 ============================
 
