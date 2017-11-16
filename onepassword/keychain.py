@@ -99,8 +99,11 @@ class KeychainItem(object):
         self.identifier = identifier
         self.name = name
         self.password = None
+        self.username = None
+        self.website = None
         self._path = path
         self._type = type
+        self._data = None
 
     @property
     def key_identifier(self):
@@ -123,10 +126,19 @@ class KeychainItem(object):
 
         self._data = json.loads(decrypted_json)
         self.password = self._find_password()
+        self.username = self._find_username()
+        self.website = self._find_website()
 
     def _find_password(self):
         raise Exception("Cannot extract a password from this type of"
                         " keychain item (%s)" % self._type)
+
+    def _find_user(self):
+        raise Exception("Cannot extract a user from this type of"
+                        " keychain item (%s)" % self._type)
+
+    def _find_website(self):
+        return None
 
     def _lazily_load(self, attr):
         if not hasattr(self, attr):
@@ -144,14 +156,34 @@ class KeychainItem(object):
         self._encrypted_json = item_data["encrypted"]
 
 
+def caseequal(s1, s2):
+    """Case insensitive comparison, also handling uninitialized arguments"""
+    return s1 and s2 and s1.lower() == s2.lower()
+
+
 class WebFormKeychainItem(KeychainItem):
-    def _find_password(self):
+    def _find_field(self, key):
         for field in self._data["fields"]:
-            if field.get("designation") == "password" or \
-               field.get("name") == "Password":
+            if caseequal(field.get("designation"), key) or \
+               caseequal(field.get("name"), key):
                 return field["value"]
+
+    def _find_password(self):
+        return self._find_field("password")
+
+    def _find_username(self):
+        return self._find_field("username")
+
+    def _find_website(self):
+        urls = self._data.get("URLs", None)
+        if urls and len(urls) > 0:
+            return urls[0].get("url", None)
+        return None
 
 
 class PasswordKeychainItem(KeychainItem):
     def _find_password(self):
-        return self._data["password"]
+        return self._data.get("password")
+
+    def _find_username(self):
+        return self._data.get("username")
