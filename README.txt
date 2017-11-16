@@ -34,6 +34,24 @@ If you don't want to be prompted for your password, you can use the
 
     emit_master_password | 1pass --no-prompt mail.google.com
 
+If you want to copy the password to the clipboard, instead of printing
+it to the screen, use:
+
+    1pass -c mail.google.com
+
+To see additional information about an item, use ``-i``, for example:
+
+    1pass -c -i mail.google.com
+
+To open a website for a given password, use ``-o``, for example:
+
+    1pass -c -o mail.google.com
+
+You can also get the username, instead of the password, for example:
+
+    1pass -u mail.google.com
+
+
 Python usage
 ============
 
