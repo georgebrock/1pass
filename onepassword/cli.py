@@ -3,6 +3,7 @@ import getpass
 import os
 import pyperclip
 import sys
+import webbrowser
 
 from onepassword import Keychain
 
@@ -43,10 +44,37 @@ class CLI(object):
             sys.exit(os.EX_DATAERR)
 
     def produce(self, item):
-        if self.arguments.copy:
-            pyperclip.copy(item.password)
+        # Show info if needed
+        if self.arguments.info:
+            self.stdout.write("Item info:\n")
+            self.stdout.write("  identifier: %s\n" % item.identifier)
+            self.stdout.write("  name      : %s\n" % item.name)
+            self.stdout.write("  username  : %s\n" % item.username)
+            self.stdout.write("  website   : %s\n" % item.website)
+
+        # Determine if we're using username or password
+        if self.arguments.user:
+            key = "username"
+            val = item.username
         else:
-            self.stdout.write("%s\n" % item.password)
+            key = "password"
+            val = item.password
+
+        # Print or copy the item
+        if self.arguments.copy:
+            self.stdout.write("%s copied to clipboard\n" % key)
+            pyperclip.copy(val)
+        else:
+            self.stdout.write("%s\n" % val)
+
+        # Open the website
+        if self.arguments.open:
+            url = item.website
+            if url is None:
+                self.stderr.write("Can't find the website url")
+                sys.exit(os.EX_DATAERR)
+            self.stdout.write("Opening %s in a browser\n" % url)
+            webbrowser.open(url, new=2, autoraise=True)
 
     def argument_parser(self):
         parser = argparse.ArgumentParser()
@@ -70,6 +98,21 @@ class CLI(object):
             "-c", "--copy",
             action="store_true",
             help="Copy the password to the clipboard, instead of printing it",
+        )
+        parser.add_argument(
+            "-u", "--user",
+            action="store_true",
+            help="Instead of password, use the username",
+        )
+        parser.add_argument(
+            "-i", "--info",
+            action="store_true",
+            help="Print the info about the found item",
+        )
+        parser.add_argument(
+            "-o", "--open",
+            action="store_true",
+            help="Open a given page in the browser",
         )
 
         return parser
