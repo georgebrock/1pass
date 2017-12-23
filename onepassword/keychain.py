@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import functools
 from fuzzywuzzy import process
 
@@ -121,7 +122,10 @@ class KeychainItem(object):
         if isinstance(decrypted_json, bytes):
             decrypted_json = decrypted_json.decode('utf-8')
 
+        # Remove trailing backspace characters from json
+        decrypted_json = re.sub('\x08*$', '', decrypted_json)
         self._data = json.loads(decrypted_json)
+
         self.password = self._find_password()
 
     def _find_password(self):
